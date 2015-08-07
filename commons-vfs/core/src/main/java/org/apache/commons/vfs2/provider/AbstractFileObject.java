@@ -34,7 +34,10 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.cert.Certificate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.apache.log4j.Logger;
 
 /**
  * A partial file object implementation.
@@ -51,6 +54,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
      * (eg 'this file type does not support listing children', vs 'this is not a folder')
      */
 
+    private static final Logger log = Logger.getLogger(AbstractFileObject.class);
     private static final FileName[] EMPTY_FILE_ARRAY = {};
 
     private static final int INITIAL_LIST_SIZE = 5;
@@ -70,6 +74,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
     private FileName[] children;
 
     private List<Object> objects;
+    private static AtomicInteger lc = new AtomicInteger(0);
 
     /**
      * FileServices instance.
@@ -151,7 +156,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
      */
     private void attach() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -185,7 +190,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
 
             // fs.fileAttached(this);
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -351,7 +356,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
     @Override
     public void createFile() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -379,7 +384,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
                 throw new FileSystemException("vfs.provider/create-file.error", fileName, e);
             }
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -391,7 +396,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
     @Override
     public void createFolder() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -437,7 +442,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
                 throw new FileSystemException("vfs.provider/create-folder.error", fileName, exc);
             }
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -527,7 +532,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
      */
     private boolean deleteSelf() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -560,7 +565,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
 
             return true;
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -571,7 +576,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
      */
     private void detach() throws Exception
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -594,7 +599,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
                 }
             }
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -1144,7 +1149,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
     @Override
     public FileObject[] getChildren() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -1234,7 +1239,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
 
             return resolveFiles(children);
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -1246,7 +1251,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
     @Override
     public FileContent getContent() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -1257,7 +1262,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
             }
             return content;
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -1449,7 +1454,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
             }
         }
 
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -1465,7 +1470,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
             }
             return parent;
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -1528,7 +1533,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
     @Override
     public FileType getType() throws FileSystemException
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -1553,7 +1558,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
 
             return type;
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -1607,7 +1612,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
      */
     protected void handleCreate(final FileType newType) throws Exception
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());;fileLockStrategy.lock();lc.incrementAndGet();  log.warn("LOCK: " + lc); 
 
         try
         {
@@ -1628,7 +1633,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
             // Notify the file system
             fs.fireFileCreated(this);
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 
@@ -1639,7 +1644,9 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
      */
     protected void handleDelete() throws Exception
     {
-        fileLockStrategy.lock();
+        ReentrantLock lock = (ReentrantLock) fileLockStrategy;log.warn("attempting increment LOCK: " + lock +" w/ queue len  "+lock.getQueueLength() + " count="+lc.get());
+        fileLockStrategy.lock();lc.incrementAndGet();   
+        log.warn("LOCK: " + lc); 
 
         try
         {
@@ -1659,7 +1666,7 @@ public abstract class AbstractFileObject<AFS extends AbstractFileSystem> impleme
             // Notify the file system
             fs.fireFileDeleted(this);
         } finally {
-            fileLockStrategy.unlock();
+            lc.decrementAndGet();fileLockStrategy.unlock(); log.warn("UNLOCKED: "+ lock+"  new queue len  "+lock.getQueueLength());
         }
     }
 

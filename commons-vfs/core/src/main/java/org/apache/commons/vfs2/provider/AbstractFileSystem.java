@@ -317,7 +317,8 @@ public abstract class AbstractFileSystem
         return resolveFile(name, true);
     }
 
-    private synchronized FileObject resolveFile(final FileName name, final boolean useCache) throws FileSystemException
+    //was synchronized
+    private FileObject resolveFile(final FileName name, final boolean useCache) throws FileSystemException
     {
         if (!rootName.getRootURI().equals(name.getRootURI()))
         {
